@@ -1,26 +1,31 @@
 import express from "express";
-import Property from "../models/Property.js";
+
+import {
+  createProperty,
+  getProperties,
+  getPropertyById,
+  updateProperty,
+  deleteProperty,
+} from "../controllers/propertyController.js";
+
+import protect from "../middleware/authMiddleware.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
+// CREATE WITH IMAGE
+router.post("/", protect, upload.single("image"), createProperty);
 
-router.post("/", async (req, res) => {
-  try {
-    const data = await Property.create(req.body);
-    res.json(data);
-  } catch (err) {
-    res.json(err);
-  }
-});
+// GET ALL
+router.get("/", getProperties);
 
+// SINGLE
+router.get("/:id", getPropertyById);
 
-router.get("/", async (req, res) => {
-  try {
-    const data = await Property.find();
-    res.json(data);
-  } catch (err) {
-    res.json(err);
-  }
-});
+// UPDATE
+router.put("/:id", protect, updateProperty);
+
+// DELETE
+router.delete("/:id", protect, deleteProperty);
 
 export default router;
