@@ -1,22 +1,31 @@
+// Favorites Utility Helper Functions
 export const getFavorites = () => {
-  return JSON.parse(localStorage.getItem("favorites")) || [];
+  try {
+    const favs = localStorage.getItem('favorites');
+    return favs ? JSON.parse(favs) : [];
+  } catch (error) {
+    return [];
+  }
 };
 
-export const addFavorite = (property) => {
-  let favs = getFavorites();
-
-  const exists = favs.find((p) => p.id === property.id);
-
-  if (!exists) {
-    favs.push(property);
-    localStorage.setItem("favorites", JSON.stringify(favs));
+export const addFavorite = (id) => {
+  try {
+    const favs = getFavorites();
+    if (!favs.includes(id)) {
+      favs.push(id);
+      localStorage.setItem('favorites', JSON.stringify(favs));
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 
 export const removeFavorite = (id) => {
-  let favs = getFavorites();
-
-  favs = favs.filter((p) => p.id !== id);
-
-  localStorage.setItem("favorites", JSON.stringify(favs));
+  try {
+    const favs = getFavorites();
+    const updated = favs.filter(favId => favId !== id);
+    localStorage.setItem('favorites', JSON.stringify(updated));
+  } catch (error) {
+    console.error(error);
+  }
 };

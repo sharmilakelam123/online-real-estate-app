@@ -1,92 +1,30 @@
-import Navbar from "../components/common/Navbar";
-import Footer from "../components/common/Footer";
-import { useState } from "react";
-
-function Login() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    address: "",
-  });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
+import { loginSuccess } from '../redux/store';
+export default function Login() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
-    alert("Login Success");
+    dispatch(loginSuccess({
+      user: { name: 'Demo User', email },
+      token: 'mock-jwt-token'
+    }));
+    alert("Logged in successfully!");
+    navigate('/');
   };
-
   return (
-    <>
-      <Navbar />
-
-      <div className="flex justify-center items-center min-h-[80vh] bg-gray-100">
-
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-red-500"
-        >
-
-          <h2 className="text-3xl font-bold text-center text-red-600 mb-6">
-            Login
-          </h2>
-
-          {/* NAME */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            className="w-full border border-red-300 p-3 rounded mb-3 text-black focus:outline-red-500"
-            onChange={handleChange}
-            required
-          />
-
-          {/* EMAIL */}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            className="w-full border border-red-300 p-3 rounded mb-3 text-black focus:outline-red-500"
-            onChange={handleChange}
-            required
-          />
-
-          {/* PASSWORD */}
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full border border-red-300 p-3 rounded mb-3 text-black focus:outline-red-500"
-            onChange={handleChange}
-            required
-          />
-
-          {/* ADDRESS */}
-          <textarea
-            name="address"
-            placeholder="Full Address"
-            className="w-full border border-red-300 p-3 rounded mb-4 text-black focus:outline-red-500"
-            onChange={handleChange}
-          />
-
-          {/* BUTTON */}
-          <button
-            type="submit"
-            className="w-full bg-red-500 text-white py-3 rounded hover:bg-red-600 font-bold"
-          >
-            LOGIN
-          </button>
-
-        </form>
-
-      </div>
-
-      <Footer />
-    </>
+    <div style={{ maxWidth: '400px', margin: '60px auto', padding: '24px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+      <h2 style={{ margin: '0 0 20px 0', textAlign: 'center' }}>Sign In</h2>
+      <form onSubmit={handleLoginSubmit}>
+        <input type="email" placeholder="Email" required value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+        <input type="password" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '20px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+        <button type="submit" style={{ width: '100%', backgroundColor: '#0054a6', color: '#ffffff', border: 'none', padding: '12px', borderRadius: '4px', fontWeight: '700', cursor: 'pointer' }}>Login</button>
+      </form>
+      <p style={{ fontSize: '13px', textAlign: 'center', marginTop: '16px' }}>Don't have an account? <Link to="/register" style={{ color: '#0054a6' }}>Register</Link></p>
+    </div>
   );
 }
-
-export default Login;

@@ -1,329 +1,158 @@
-import Navbar from "../components/common/Navbar";
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { apiPost } from '../utils/api';
+import { saveRecentlyViewed, saveContactedLead } from '../utils/activity';
+export default function PropertyDetails() {
+  const { id } = useParams();
+  const properties = useSelector(state => state.properties.items);
+  const property = properties.find(p => String(p?._id || p?.id) === String(id));
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [message, setMessage] = useState('I am interested. Please call me back.');
+  const [preferredVisitAt, setPreferredVisitAt] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  if (!property) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <h2>Property Not Found</h2>
+        <p>The requested listing could not be found or has been removed.</p>
+        <Link to="/" style={{ color: '#0054a6', fontWeight: '600' }}>Return Home</Link>
+      </div>
+    );
+  }
 
-function PropertyDetails() {
-  const property = {
-    title: "Luxury 3BHK Villa",
-    location: "Jayanagar, Bangalore",
-    price: "2.5 Cr",
-    type: "Villa",
-    status: "Ready to Move",
-    area: "1800 sqft",
-    bedrooms: "3 BHK",
-    bathrooms: "3 Bath",
-    furnishing: "Semi-Furnished",
-    phone: "919876543210",
-
-    image:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
-
-    gallery: [
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80",
-    ],
-  };
-
+  useEffect(() => {
+    saveRecentlyViewed(property._id || property.id);
+  }, [property._id, property.id]);
   return (
-    <>
-      <Navbar />
-
-      {/* TOP BANNER */}
-      <div className="bg-blue-600 text-white text-center py-3 font-semibold">
-        🔥 Premium Property | Free Site Visit Available
-      </div>
-
-      {/* MAIN SECTION */}
-      <div className="max-w-7xl mx-auto p-6 grid md:grid-cols-2 gap-8">
-
-        {/* LEFT SIDE */}
+    <div style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
+      <Link to="/" style={{ color: '#0054a6', textDecoration: 'none', fontWeight: '600' }}>← Back to Listings</Link>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '32px', marginTop: '20px' }}>
+        {/* Left Side Details */}
         <div>
-          <img
-            src={property.image}
-            alt={property.title}
-            className="w-full h-[450px] object-cover rounded-2xl shadow-lg"
-          />
-
-          {/* GALLERY */}
-          <div className="grid grid-cols-4 gap-3 mt-4">
-            {property.gallery.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt=""
-                className="h-24 w-full object-cover rounded-lg cursor-pointer hover:scale-105 transition"
+          <div style={{ height: '400px', borderRadius: '12px', overflow: 'hidden', marginBottom: '24px' }}>
+            <img src={property.image} alt={property.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+          
+          <h1 style={{ fontSize: '28px', fontWeight: '800', margin: '0 0 10px 0' }}>{property.title}</h1>
+          <p style={{ color: '#64748b', fontSize: '15px', margin: '0 0 20px 0' }}>📍 {property.location}</p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '16px',
+            backgroundColor: '#f8fafc',
+            padding: '20px',
+            borderRadius: '8px',
+            marginBottom: '24px',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div>
+              <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>Price</span>
+              <h3 style={{ margin: '4px 0 0 0', color: '#0054a6' }}>
+                ₹{(Number(property.price || 0) / 10000000).toFixed(2)} Cr
+              </h3>
+            </div>
+            <div>
+              <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>BHK</span>
+              <h3 style={{ margin: '4px 0 0 0' }}>{property.bedrooms ?? property.bhk ?? '-'} BHK</h3>
+            </div>
+            <div>
+              <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>Area</span>
+              <h3 style={{ margin: '4px 0 0 0' }}>{property.area ?? '-'}</h3>
+            </div>
+          </div>
+          <div>
+            <h3>Overview</h3>
+            <p style={{ color: '#475569', lineHeight: '1.7' }}>
+              Premium real estate opportunity situated in the heart of {property.location.split(',')[0]}. Designed with state of the art layouts, standard air ventilation, natural lighting, and modern building standards. Immediate registration and ready to occupy.
+            </p>
+          </div>
+        </div>
+        {/* Right Side Agent Sidebar Form */}
+        <div>
+          <div style={{
+            backgroundColor: '#ffffff',
+            border: '1px solid #cbd5e1',
+            borderRadius: '12px',
+            padding: '24px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            position: 'sticky',
+            top: '100px'
+          }}>
+            <h3 style={{ margin: '0 0 6px 0' }}>Contact Builder / Owner</h3>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 20px 0' }}>Instant site visits, RERA registrations.</p>
+            
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  setSubmitting(true);
+                  const lead = await apiPost('/api/leads', {
+                    propertyId: property._id || property.id,
+                    name,
+                    phone,
+                    message,
+                    preferredVisitAt: preferredVisitAt || null,
+                  });
+                  saveContactedLead(lead);
+                  alert("Enquiry registered! Check Dashboard → Enquiries / My Activity → Contacted.");
+                  setName('');
+                  setPhone('');
+                  setPreferredVisitAt('');
+                } catch (err) {
+                  alert(err?.message || "Failed to submit enquiry");
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
               />
-            ))}
-          </div>
-
-          {/* QUICK STATS */}
-          <div className="grid grid-cols-3 gap-3 mt-5">
-
-            <div className="shadow-md p-4 rounded-xl text-center">
-              <p className="font-bold text-lg">
-                {property.bedrooms}
-              </p>
-              <p className="text-gray-500 text-sm">
-                Bedrooms
-              </p>
-            </div>
-
-            <div className="shadow-md p-4 rounded-xl text-center">
-              <p className="font-bold text-lg">
-                {property.bathrooms}
-              </p>
-              <p className="text-gray-500 text-sm">
-                Bathrooms
-              </p>
-            </div>
-
-            <div className="shadow-md p-4 rounded-xl text-center">
-              <p className="font-bold text-lg">
-                {property.area}
-              </p>
-              <p className="text-gray-500 text-sm">
-                Area
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-        {/* RIGHT SIDE */}
-        <div className="space-y-4">
-
-          <h1 className="text-4xl font-bold">
-            {property.title}
-          </h1>
-
-          <p className="text-gray-600 text-lg">
-            📍 {property.location}
-          </p>
-
-          <span className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm">
-            {property.status}
-          </span>
-
-          <div className="space-y-2 pt-2">
-            <p>
-              Property Type: <b>{property.type}</b>
-            </p>
-
-            <p>
-              Furnishing: <b>{property.furnishing}</b>
-            </p>
-
-            <p>
-              Area: <b>{property.area}</b>
-            </p>
-          </div>
-
-          <h2 className="text-4xl text-red-500 font-bold">
-            ₹ {property.price}
-          </h2>
-
-          {/* ACTION BUTTONS */}
-          <div className="space-y-3 pt-4">
-
-            <a
-              href={`https://wa.me/${property.phone}`}
-              target="_blank"
-              rel="noreferrer"
-              className="block text-center bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold"
-            >
-              💬 Chat on WhatsApp
-            </a>
-
-            <a
-              href={`tel:${property.phone}`}
-              className="block text-center bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold"
-            >
-              📞 Call Owner
-            </a>
-
-            <a
-              href="https://maps.google.com/?q=Bangalore"
-              target="_blank"
-              rel="noreferrer"
-              className="block text-center bg-gray-800 hover:bg-black text-white py-3 rounded-xl font-semibold"
-            >
-              📍 View on Map
-            </a>
-
-          </div>
-
-          {/* PROPERTY SCORE */}
-          <div className="border rounded-xl p-4 mt-6">
-            <h3 className="font-bold text-lg mb-3">
-              Property Score ⭐
-            </h3>
-
-            <p>Location ⭐⭐⭐⭐⭐</p>
-            <p>Amenities ⭐⭐⭐⭐</p>
-            <p>Connectivity ⭐⭐⭐⭐⭐</p>
-            <p>Value for Money ⭐⭐⭐⭐</p>
-          </div>
-
-        </div>
-      </div>
-
-      {/* PROPERTY HIGHLIGHTS */}
-      <div className="max-w-7xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-5">
-          Property Highlights 🏡
-        </h2>
-
-        <div className="grid md:grid-cols-4 gap-4">
-
-          <div className="shadow-md p-4 rounded-xl">
-            <p className="font-bold">3 BHK</p>
-            <p className="text-gray-500 text-sm">
-              Spacious Bedrooms
-            </p>
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl">
-            <p className="font-bold">Modern Kitchen</p>
-            <p className="text-gray-500 text-sm">
-              Fully Equipped
-            </p>
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl">
-            <p className="font-bold">Parking</p>
-            <p className="text-gray-500 text-sm">
-              2 Cars
-            </p>
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl">
-            <p className="font-bold">Security</p>
-            <p className="text-gray-500 text-sm">
-              24/7 CCTV
-            </p>
-          </div>
-
-        </div>
-      </div>
-
-      {/* AMENITIES */}
-      <div className="max-w-7xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-5">
-          Amenities ✨
-        </h2>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            🏊 Swimming Pool
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            🏋 Gym
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            🚗 Parking
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            🛡 Security
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            ⚡ Power Backup
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            🌳 Garden
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            🛗 Lift
-          </div>
-
-          <div className="shadow-md p-4 rounded-xl text-center">
-            🎾 Sports Area
-          </div>
-
-        </div>
-      </div>
-
-      {/* ABOUT PROPERTY */}
-      <div className="max-w-7xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-4">
-          About Property
-        </h2>
-
-        <p className="text-gray-600 leading-8">
-          Luxury 3BHK Villa located in Jayanagar,
-          Bangalore. This premium villa offers spacious
-          bedrooms, modular kitchen, private parking,
-          landscaped garden and modern interiors.
-          Perfect for families looking for comfort,
-          luxury and connectivity.
-        </p>
-      </div>
-
-      {/* OWNER DETAILS */}
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="shadow-lg border rounded-2xl p-6">
-
-          <h2 className="text-2xl font-bold mb-4">
-            Owner Details
-          </h2>
-
-          <p>👤 Rajesh Kumar</p>
-          <p>📞 +91 9876543210</p>
-          <p>⭐ Verified Owner</p>
-
-          <button className="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl">
-            Chat Owner
-          </button>
-
-        </div>
-      </div>
-
-      {/* SIMILAR PROPERTIES */}
-      <div className="max-w-7xl mx-auto p-6 mb-10">
-
-        <h2 className="text-2xl font-bold mb-5">
-          Similar Properties
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-6">
-
-          {[1, 2, 3].map((item) => (
-            <div
-              key={item}
-              className="shadow-lg rounded-2xl overflow-hidden"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80"
-                alt=""
-                className="h-56 w-full object-cover"
+              <input
+                type="tel"
+                placeholder="Mobile Phone"
+                required
+                pattern="[0-9]{10}"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
               />
-
-              <div className="p-4">
-                <h3 className="font-bold text-lg">
-                  Luxury Villa
-                </h3>
-
-                <p className="text-gray-500">
-                  Bangalore
-                </p>
-
-                <p className="text-red-500 font-bold mt-2">
-                  ₹2.1 Cr
-                </p>
-              </div>
-            </div>
-          ))}
-
+              <input
+                type="datetime-local"
+                value={preferredVisitAt}
+                onChange={(e) => setPreferredVisitAt(e.target.value)}
+                style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+              />
+              <textarea
+                placeholder="Message"
+                rows="3"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                style={{ width: '100%', padding: '10px', marginBottom: '16px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+              ></textarea>
+              <button type="submit" style={{
+                width: '100%',
+                backgroundColor: '#ff8f00',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px',
+                borderRadius: '6px',
+                fontWeight: '700',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }} disabled={submitting}>{submitting ? 'Submitting…' : 'Request Call Back'}</button>
+            </form>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
-
-export default PropertyDetails;

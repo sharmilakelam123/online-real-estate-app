@@ -3,6 +3,8 @@ import express from "express";
 import {
   createProperty,
   getProperties,
+  getPropertyStats,
+  getLocalityTrends,
   getPropertyById,
   updateProperty,
   deleteProperty,
@@ -18,6 +20,10 @@ router.post("/", protect, upload.single("image"), createProperty);
 
 // GET ALL
 router.get("/", getProperties);
+
+// STATS (must be before /:id)
+router.get("/stats", getPropertyStats);
+router.get("/locality-trends", getLocalityTrends);
 
 // SINGLE
 router.get("/:id", getPropertyById);
