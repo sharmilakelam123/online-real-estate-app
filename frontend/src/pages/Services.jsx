@@ -16,6 +16,7 @@ export default function Services() {
   const [loanAmount, setLoanAmount] = useState(5000000); // 50 Lakhs
   const [interestRate, setInterestRate] = useState(8.5); // 8.5%
   const [loanTenure, setLoanTenure] = useState(20); // 20 years
+  const [selectedCity, setSelectedCity] = useState("Visakhapatnam");
 
   const [emi, setEmi] = useState(0);
   const [totalInterest, setTotalInterest] = useState(0);
@@ -45,7 +46,10 @@ export default function Services() {
   const [isGenerated, setIsGenerated] = useState(false);
 
   const handlePrint = () => {
-    const printContent = document.getElementById("rent-receipt-print-area").innerHTML;
+    const printEl = document.getElementById("rent-receipt-print-area");
+    if (!printEl) return;
+
+    const printContent = printEl.innerHTML;
     const originalContent = document.body.innerHTML;
     document.body.innerHTML = printContent;
     window.print();
@@ -53,53 +57,52 @@ export default function Services() {
     window.location.reload(); // Quick restore
   };
 
-  // Property Rates Data
   const RATES_DATA = {
     Visakhapatnam: [
-      { locality: "Madhurawada", rate: "₹5,350/sqft", trend: "+7.0% YoY", status: "up" },
-      { locality: "Yendada", rate: "₹5,800/sqft", trend: "+8.5% YoY", status: "up" },
-      { locality: "Seethammadhara", rate: "₹6,200/sqft", trend: "+5.2% YoY", status: "up" },
-      { locality: "MVP Colony", rate: "₹6,500/sqft", trend: "+4.8% YoY", status: "up" },
-      { locality: "Gajuwaka", rate: "₹4,600/sqft", trend: "+6.1% YoY", status: "up" },
-      { locality: "Sheela Nagar", rate: "₹4,950/sqft", trend: "+15.1% YoY", status: "up" }
+      { locality: "Madhurawada", rate: "₹ 4,500/sqft", trend: "+6.2% YoY" },
+      { locality: "Yendada", rate: "₹ 5,200/sqft", trend: "+4.1% YoY" },
+      { locality: "Seethammadhara", rate: "₹ 4,900/sqft", trend: "+3.8% YoY" },
+      { locality: "MVP Colony", rate: "₹ 6,100/sqft", trend: "+5.4% YoY" }
     ],
-    Srikakulam: [
-      { locality: "Balaga", rate: "₹2,800/sqft", trend: "+4.2% YoY", status: "up" },
-      { locality: "Etcherla", rate: "₹1,500/sqft", trend: "+3.0% YoY", status: "up" },
-      { locality: "Arasavilli", rate: "₹3,200/sqft", trend: "+5.0% YoY", status: "up" },
-      { locality: "Ragolu", rate: "₹1,800/sqft", trend: "+2.5% YoY", status: "up" }
+    Hyderabad: [
+      { locality: "Kukatpally", rate: "₹ 6,800/sqft", trend: "+7.1% YoY" },
+      { locality: "Hitech City", rate: "₹ 7,500/sqft", trend: "+4.6% YoY" },
+      { locality: "Gachibowli", rate: "₹ 8,200/sqft", trend: "+6.0% YoY" },
+      { locality: "Kondapur", rate: "₹ 6,950/sqft", trend: "+5.2% YoY" }
+    ],
+    Mumbai: [
+      { locality: "Andheri West", rate: "₹ 14,500/sqft", trend: "+3.2% YoY" },
+      { locality: "Bandra", rate: "₹ 18,000/sqft", trend: "+2.4% YoY" },
+      { locality: "Powai", rate: "₹ 12,900/sqft", trend: "+4.1% YoY" },
+      { locality: "Thane", rate: "₹ 10,800/sqft", trend: "+5.8% YoY" }
     ]
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "32px auto", padding: "0 20px" }}>
-      <div style={{ textAlign: "center", marginBottom: "40px" }}>
-        <h1 style={{ fontSize: "32px", fontWeight: "900", color: "#0f172a", margin: "0 0 10px 0" }}>
-          RealEstate Services & Insights
-        </h1>
-        <p style={{ fontSize: "16px", color: "#64748b", margin: 0 }}>
-          Fully interactive toolkits for Buyers, Tenants, Owners, and Builders.
-        </p>
-      </div>
+    <div>
+      {/* Removed top Property Rates & Trends split layout to keep only the lower single UI section */}
+
 
       {/* Main Tab Controller Bar */}
-      <div style={{
-        display: "flex",
-        gap: "10px",
-        background: "#ffffff",
-        border: "1px solid #e2e8f0",
-        borderRadius: "16px",
-        padding: "8px",
-        marginBottom: "28px",
-        flexWrap: "wrap",
-        boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "16px",
+          padding: "8px",
+          marginBottom: "28px",
+          flexWrap: "wrap",
+          boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)"
+        }}
+      >
         {[
           { key: "buyers", label: "For Buyers", defaultTool: "emi" },
           { key: "tenants", label: "For Tenants", defaultTool: "rent" },
           { key: "owners", label: "For Owners", defaultTool: "guide" },
           { key: "dealers", label: "For Dealers / Builders", defaultTool: "analytics" }
-        ].map(tabOpt => (
+        ].map((tabOpt) => (
           <button
             key={tabOpt.key}
             onClick={() => setTabAndTool(tabOpt.key, tabOpt.defaultTool)}
@@ -124,60 +127,108 @@ export default function Services() {
 
       <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: "32px", alignItems: "start" }}>
         {/* Sidebar Tool Navigation */}
-        <div style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          border: "1px solid #e2e8f0",
-          padding: "16px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px"
-        }}>
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "16px",
+            border: "1px solid #e2e8f0",
+            padding: "16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px"
+          }}
+        >
           {activeTab === "buyers" && (
             <>
-              <button onClick={() => setTabAndTool("buyers", "emi")} style={sidebarBtnStyle(activeTool === "emi")}>Home Loan EMI Calculator</button>
-              <button onClick={() => setTabAndTool("buyers", "rates")} style={sidebarBtnStyle(activeTool === "rates")}>Property Rates & Trends</button>
-              <button onClick={() => setTabAndTool("buyers", "policy")} style={sidebarBtnStyle(activeTool === "policy")}>GST & RERA Policies</button>
+              <button onClick={() => setTabAndTool("buyers", "emi")} style={sidebarBtnStyle(activeTool === "emi")}>
+                Home Loan EMI Calculator
+              </button>
+              <button
+                onClick={() => setTabAndTool("buyers", "rates")}
+                style={sidebarBtnStyle(activeTool === "rates")}
+              >
+                Property Rates & Trends
+              </button>
+              <button
+                onClick={() => setTabAndTool("buyers", "policy")}
+                style={sidebarBtnStyle(activeTool === "policy")}
+              >
+                GST & RERA Policies
+              </button>
             </>
           )}
           {activeTab === "tenants" && (
             <>
-              <button onClick={() => setTabAndTool("tenants", "rent")} style={sidebarBtnStyle(activeTool === "rent")}>Rent Receipt Generator</button>
-              <button onClick={() => setTabAndTool("tenants", "guide")} style={sidebarBtnStyle(activeTool === "guide")}>Renting Checklists</button>
+              <button onClick={() => setTabAndTool("tenants", "rent")} style={sidebarBtnStyle(activeTool === "rent")}>
+                Rent Receipt Generator
+              </button>
+              <button
+                onClick={() => setTabAndTool("tenants", "guide")}
+                style={sidebarBtnStyle(activeTool === "guide")}
+              >
+                Renting Checklists
+              </button>
             </>
           )}
           {activeTab === "owners" && (
             <>
-              <button onClick={() => setTabAndTool("owners", "guide")} style={sidebarBtnStyle(activeTool === "guide")}>Selling / Posting Guide</button>
-              <button onClick={() => setTabAndTool("owners", "valuation")} style={sidebarBtnStyle(activeTool === "valuation")}>Property Valuation Est.</button>
+              <button onClick={() => setTabAndTool("owners", "guide")} style={sidebarBtnStyle(activeTool === "guide")}
+              >
+                Selling / Posting Guide
+              </button>
+              <button
+                onClick={() => setTabAndTool("owners", "valuation")}
+                style={sidebarBtnStyle(activeTool === "valuation")}
+              >
+                Property Valuation Est.
+              </button>
             </>
           )}
           {activeTab === "dealers" && (
             <>
-              <button onClick={() => setTabAndTool("dealers", "analytics")} style={sidebarBtnStyle(activeTool === "analytics")}>Marketing & Leads Dashboard</button>
+              <button
+                onClick={() => setTabAndTool("dealers", "analytics")}
+                style={sidebarBtnStyle(activeTool === "analytics")}
+              >
+                Marketing & Leads Dashboard
+              </button>
             </>
           )}
         </div>
 
         {/* Content Display Window */}
-        <div style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          border: "1px solid #e2e8f0",
-          padding: "24px",
-          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.04)"
-        }}>
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "16px",
+            border: "1px solid #e2e8f0",
+            padding: "24px",
+            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.04)"
+          }}
+        >
           {/* BUYERS: EMI Calculator */}
           {activeTab === "buyers" && activeTool === "emi" && (
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>Home Loan EMI Calculator</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>Adjust sliders below to view your monthly installments, total interest, and payout breakdowns.</p>
-              
+              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>
+                Home Loan EMI Calculator
+              </h2>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>
+                Adjust sliders below to view your monthly installments, total interest, and payout breakdowns.
+              </p>
+
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
                 {/* Sliders */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "800", fontSize: "14px", marginBottom: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontWeight: "800",
+                        fontSize: "14px",
+                        marginBottom: "6px"
+                      }}
+                    >
                       <span>Loan Amount</span>
                       <span style={{ color: "#0054a6" }}>₹{(loanAmount / 100000).toFixed(1)} Lakhs</span>
                     </div>
@@ -193,7 +244,15 @@ export default function Services() {
                   </div>
 
                   <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "800", fontSize: "14px", marginBottom: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontWeight: "800",
+                        fontSize: "14px",
+                        marginBottom: "6px"
+                      }}
+                    >
                       <span>Interest Rate</span>
                       <span style={{ color: "#0054a6" }}>{interestRate}%</span>
                     </div>
@@ -209,7 +268,15 @@ export default function Services() {
                   </div>
 
                   <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "800", fontSize: "14px", marginBottom: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontWeight: "800",
+                        fontSize: "14px",
+                        marginBottom: "6px"
+                      }}
+                    >
                       <span>Tenure (Years)</span>
                       <span style={{ color: "#0054a6" }}>{loanTenure} Years</span>
                     </div>
@@ -226,18 +293,38 @@ export default function Services() {
                 </div>
 
                 {/* Calculation Cards */}
-                <div style={{
-                  background: "#f8fafc",
-                  borderRadius: "12px",
-                  padding: "20px",
-                  border: "1px solid #e2e8f0",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between"
-                }}>
-                  <div style={{ borderBottom: "1px solid #e2e8f0", paddingBottom: "14px", marginBottom: "14px", textAlign: "center" }}>
-                    <div style={{ fontSize: "13px", fontWeight: "800", color: "#64748b", textTransform: "uppercase" }}>Monthly Loan EMI</div>
-                    <div style={{ fontSize: "28px", fontWeight: "900", color: "#0054a6", marginTop: "4px" }}>₹{emi.toLocaleString("en-IN")}</div>
+                <div
+                  style={{
+                    background: "#f8fafc",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    border: "1px solid #e2e8f0",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between"
+                  }}
+                >
+                  <div
+                    style={{
+                      borderBottom: "1px solid #e2e8f0",
+                      paddingBottom: "14px",
+                      marginBottom: "14px",
+                      textAlign: "center"
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: "800",
+                        color: "#64748b",
+                        textTransform: "uppercase"
+                      }}
+                    >
+                      Monthly Loan EMI
+                    </div>
+                    <div style={{ fontSize: "28px", fontWeight: "900", color: "#0054a6", marginTop: "4px" }}>
+                      ₹{emi.toLocaleString("en-IN")}
+                    </div>
                   </div>
 
                   <div style={{ display: "grid", gap: "10px", fontSize: "13px", fontWeight: "750" }}>
@@ -249,7 +336,15 @@ export default function Services() {
                       <span style={{ color: "#64748b" }}>Interest Payable</span>
                       <span style={{ color: "#0f172a" }}>₹{totalInterest.toLocaleString("en-IN")}</span>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #cbd5e1", paddingTop: "8px", fontWeight: "900" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        borderTop: "1px solid #cbd5e1",
+                        paddingTop: "8px",
+                        fontWeight: "900"
+                      }}
+                    >
                       <span style={{ color: "#0f172a" }}>Total Payment</span>
                       <span style={{ color: "#0f172a" }}>₹{totalPayment.toLocaleString("en-IN")}</span>
                     </div>
@@ -262,56 +357,108 @@ export default function Services() {
           {/* BUYERS: Property Rates */}
           {activeTab === "buyers" && activeTool === "rates" && (
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>Property Rates & Trends</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>Detailed square-foot rates list across prime localities.</p>
-              
-              <div style={{ display: "grid", gap: "24px" }}>
-                {Object.keys(RATES_DATA).map(cityName => (
-                  <div key={cityName}>
-                    <h3 style={{ fontSize: "16px", fontWeight: "850", color: "#0f172a", marginBottom: "12px", borderLeft: "4px solid #0054a6", paddingLeft: "8px" }}>
-                      {cityName}
-                    </h3>
-                    <div style={{ border: "1px solid #e2e8f0", borderRadius: "12px", overflow: "hidden" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", textTransform: "capitalize", fontSize: "13px" }}>
-                        <thead>
-                          <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", fontWeight: "800", color: "#64748b", textAlign: "left" }}>
-                            <th style={{ padding: "10px 14px" }}>Locality</th>
-                            <th style={{ padding: "10px 14px" }}>Avg Market Rate</th>
-                            <th style={{ padding: "10px 14px" }}>YoY Growth</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {RATES_DATA[cityName].map(r => (
-                            <tr key={r.locality} style={{ borderBottom: "1px solid #f1f5f9", fontWeight: "750", color: "#334155" }}>
-                              <td style={{ padding: "12px 14px" }}>{r.locality}</td>
-                              <td style={{ padding: "12px 14px" }}>{r.rate}</td>
-                              <td style={{ padding: "12px 14px", color: "#10b981" }}>{r.trend}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>
+                Property Rates & Trends
+              </h2>
+
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "16px" }}>
+                Search city and view locality-wise rates instantly.
+              </p>
+
+              {/* CITY SEARCH */}
+              <input
+                type="text"
+                placeholder="Search City (e.g. Mumbai, Hyderabad...)"
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "10px",
+                  marginBottom: "16px"
+                }}
+              />
+
+              {/* SHOW ONLY SELECTED CITY */}
+              {RATES_DATA[selectedCity] ? (
+                <div>
+                  <h3 style={{ fontSize: "16px", fontWeight: "850", marginBottom: "10px" }}>{selectedCity}</h3>
+
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ background: "#f1f5f9" }}>
+                        <th style={{ padding: "10px", textAlign: "left" }}>Locality</th>
+                        <th style={{ padding: "10px", textAlign: "left" }}>Rate</th>
+                        <th style={{ padding: "10px", textAlign: "left" }}>YoY</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {RATES_DATA[selectedCity].map((r) => (
+                        <tr key={r.locality} style={{ borderBottom: "1px solid #e2e8f0" }}>
+                          <td style={{ padding: "10px" }}>{r.locality}</td>
+                          <td style={{ padding: "10px" }}>{r.rate}</td>
+                          <td style={{ padding: "10px", color: "#10b981" }}>{r.trend}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p style={{ color: "#64748b" }}>
+                  Please search a valid city (Visakhapatnam, Hyderabad, Mumbai, etc.)
+                </p>
+              )}
             </div>
           )}
 
           {/* BUYERS: Policies FAQ */}
           {activeTab === "buyers" && activeTool === "policy" && (
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>GST & RERA Policies</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>Learn about RERA and GST rules in Indian real estate buying.</p>
+              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>
+                GST & RERA Policies
+              </h2>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>
+                Learn about RERA and GST rules in Indian real estate buying.
+              </p>
 
               <div style={{ display: "grid", gap: "12px" }}>
                 {[
-                  { q: "What is RERA?", a: "RERA stands for Real Estate Regulatory Authority. Introduced to protect home buyers and boost investments, it mandates builders to register all projects, provide timelines, and guarantee quality construction. Registered builders are given a unique RERA ID." },
-                  { q: "How much GST applies to under-construction properties?", a: "Affordable housing under-construction projects attract 1% GST, while non-affordable housing projects attract 5% GST (without Input Tax Credit). Fully finished projects with Occupancy Certificate (OC) attract 0% GST." },
-                  { q: "Why is a RERA-certified property preferred?", a: "RERA properties ensure project transparency, clear land titles, adherence to building plans, and refund policies if delivery is delayed. It heavily safeguards buyers from builder defaults." }
+                  {
+                    q: "What is RERA?",
+                    a: "RERA stands for Real Estate Regulatory Authority. Introduced to protect home buyers and boost investments, it mandates builders to register all projects, provide timelines, and guarantee quality construction. Registered builders are given a unique RERA ID."
+                  },
+                  {
+                    q: "How much GST applies to under-construction properties?",
+                    a: "Affordable housing under-construction projects attract 1% GST, while non-affordable housing projects attract 5% GST (without Input Tax Credit). Fully finished projects with Occupancy Certificate (OC) attract 0% GST."
+                  },
+                  {
+                    q: "Why is a RERA-certified property preferred?",
+                    a: "RERA properties ensure project transparency, clear land titles, adherence to building plans, and refund policies if delivery is delayed. It heavily safeguards buyers from builder defaults."
+                  }
                 ].map((item, idx) => (
-                  <details key={idx} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "12px 16px" }}>
+                  <details
+                    key={idx}
+                    style={{
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "12px",
+                      padding: "12px 16px"
+                    }}
+                  >
                     <summary style={{ fontWeight: "800", cursor: "pointer", color: "#0f172a" }}>{item.q}</summary>
-                    <p style={{ marginTop: "10px", color: "#475569", fontSize: "13px", lineHeight: "1.6", fontWeight: "600" }}>{item.a}</p>
+                    <p
+                      style={{
+                        marginTop: "10px",
+                        color: "#475569",
+                        fontSize: "13px",
+                        lineHeight: "1.6",
+                        fontWeight: "600"
+                      }}
+                    >
+                      {item.a}
+                    </p>
                   </details>
                 ))}
               </div>
@@ -321,14 +468,20 @@ export default function Services() {
           {/* TENANTS: Rent Receipt Generator */}
           {activeTab === "tenants" && activeTool === "rent" && (
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>Rent Receipt Generator</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>Generate, preview, and print rent receipts for HRA tax exemption claims instantly.</p>
+              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>
+                Rent Receipt Generator
+              </h2>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>
+                Generate, preview, and print rent receipts for HRA tax exemption claims instantly.
+              </p>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
                 {/* Form fields */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div>
-                    <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>Tenant Name</label>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>
+                      Tenant Name
+                    </label>
                     <input
                       value={tenantName}
                       onChange={(e) => setTenantName(e.target.value)}
@@ -338,7 +491,9 @@ export default function Services() {
                   </div>
 
                   <div>
-                    <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>Landlord Name</label>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>
+                      Landlord Name
+                    </label>
                     <input
                       value={landlordName}
                       onChange={(e) => setLandlordName(e.target.value)}
@@ -349,7 +504,9 @@ export default function Services() {
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                     <div>
-                      <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>Monthly Rent (₹)</label>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>
+                        Monthly Rent (₹)
+                      </label>
                       <input
                         type="number"
                         value={rentAmount}
@@ -358,7 +515,9 @@ export default function Services() {
                       />
                     </div>
                     <div>
-                      <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>Rent Period</label>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>
+                        Rent Period
+                      </label>
                       <input
                         value={rentPeriod}
                         onChange={(e) => setRentPeriod(e.target.value)}
@@ -369,7 +528,9 @@ export default function Services() {
                   </div>
 
                   <div>
-                    <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>Property Address</label>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>
+                      Property Address
+                    </label>
                     <textarea
                       value={propertyAddress}
                       onChange={(e) => setPropertyAddress(e.target.value)}
@@ -441,39 +602,59 @@ export default function Services() {
                     }}
                   >
                     {/* Revenue stamp mock */}
-                    <div style={{
-                      position: "absolute",
-                      top: "20px",
-                      right: "20px",
-                      width: "65px",
-                      height: "65px",
-                      border: "1px solid #d97706",
-                      background: "#fef3c7",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "9px",
-                      fontWeight: "900",
-                      color: "#b45309",
-                      borderRadius: "4px"
-                    }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "20px",
+                        right: "20px",
+                        width: "65px",
+                        height: "65px",
+                        border: "1px solid #d97706",
+                        background: "#fef3c7",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "9px",
+                        fontWeight: "900",
+                        color: "#b45309",
+                        borderRadius: "4px"
+                      }}
+                    >
                       <div>REVENUE</div>
                       <div>STAMP</div>
-                      <div style={{ borderTop: "1px solid #b45309", marginTop: "2px", width: "100%", textAlign: "center" }}>₹ 1</div>
+                      <div style={{ borderTop: "1px solid #b45309", marginTop: "2px", width: "100%", textAlign: "center" }}>
+                        ₹ 1
+                      </div>
                     </div>
 
-                    <div style={{ fontSize: "15px", fontWeight: "900", borderBottom: "2px solid #d97706", pb: "6px", mb: "12px", color: "#b45309" }}>
+                    <div
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "900",
+                        borderBottom: "2px solid #d97706",
+                        pb: "6px",
+                        mb: "12px",
+                        color: "#b45309"
+                      }}
+                    >
                       RENT RECEIPT
                     </div>
-                    <div><strong>Receipt No:</strong> {receiptNumber}</div>
-                    <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
+                    <div>
+                      <strong>Receipt No:</strong> {receiptNumber}
+                    </div>
+                    <div>
+                      <strong>Date:</strong> {new Date().toLocaleDateString()}
+                    </div>
                     <div style={{ borderBottom: "1px solid #fcd34d", margin: "10px 0" }}></div>
                     <div>
-                      Received a sum of <strong>₹{(rentAmount || 0).toLocaleString("en-IN")}</strong> from <strong>{tenantName || "_________________"}</strong> towards house rent for the month/period of <strong>{rentPeriod || "_________________"}</strong>.
+                      Received a sum of <strong>₹{(rentAmount || 0).toLocaleString("en-IN")}</strong> from{" "}
+                      <strong>{tenantName || "_________________"}</strong> towards house rent for the month/period of{" "}
+                      <strong>{rentPeriod || "_________________"}</strong>.
                     </div>
                     <div style={{ marginTop: "12px" }}>
-                      <strong>For House Address:</strong><br />
+                      <strong>For House Address:</strong>
+                      <br />
                       {propertyAddress || "_____________________________________"}
                     </div>
                     <div style={{ borderBottom: "1px solid #fcd34d", margin: "14px 0" }}></div>
@@ -481,7 +662,9 @@ export default function Services() {
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px", fontWeight: "900" }}>
                       <div>
                         <div>Landlord Signature:</div>
-                        <div style={{ fontStyle: "italic", color: "#475569", marginTop: "16px" }}>{landlordName || "_________________"}</div>
+                        <div style={{ fontStyle: "italic", color: "#475569", marginTop: "16px" }}>
+                          {landlordName || "_________________"}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -493,18 +676,43 @@ export default function Services() {
           {/* TENANTS: Checklist */}
           {activeTab === "tenants" && activeTool === "guide" && (
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>Renting Checklists</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>Critical things to inspect before signing a rental agreement.</p>
-              
+              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>
+                Renting Checklists
+              </h2>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>
+                Critical things to inspect before signing a rental agreement.
+              </p>
+
               <div style={{ display: "grid", gap: "12px" }}>
                 {[
-                  { t: "1. Inspect Water & Electric Fittings", d: "Turn on all taps, showers, and check flush mechanisms. Verify power points, geysers, and make sure electrical appliances provided are in working condition." },
-                  { t: "2. Verify Lock-in Period & Deposit Details", d: "Typically, rental agreements have an 11-month tenure with a 1-3 month lock-in period. Confirm deposit refund terms and paint/cleaning charges deductions." },
-                  { t: "3. Check Maintenance and Utility Bills", d: "Confirm if society maintenance fees, water charges, and parking charges are included in the monthly rent or billed separately." }
+                  {
+                    t: "1. Inspect Water & Electric Fittings",
+                    d: "Turn on all taps, showers, and check flush mechanisms. Verify power points, geysers, and make sure electrical appliances provided are in working condition."
+                  },
+                  {
+                    t: "2. Verify Lock-in Period & Deposit Details",
+                    d: "Typically, rental agreements have an 11-month tenure with a 1-3 month lock-in period. Confirm deposit refund terms and paint/cleaning charges deductions."
+                  },
+                  {
+                    t: "3. Check Maintenance and Utility Bills",
+                    d: "Confirm if society maintenance fees, water charges, and parking charges are included in the monthly rent or billed separately."
+                  }
                 ].map((item, idx) => (
-                  <div key={idx} style={{ padding: "14px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                    <div style={{ fontWeight: "800", color: "#0f172a", fontSize: "14px", marginBottom: "4px" }}>{item.t}</div>
-                    <div style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", fontWeight: "600" }}>{item.d}</div>
+                  <div
+                    key={idx}
+                    style={{
+                      padding: "14px",
+                      background: "#f8fafc",
+                      borderRadius: "12px",
+                      border: "1px solid #e2e8f0"
+                    }}
+                  >
+                    <div style={{ fontWeight: "800", color: "#0f172a", fontSize: "14px", marginBottom: "4px" }}>
+                      {item.t}
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", fontWeight: "600" }}>
+                      {item.d}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -514,18 +722,43 @@ export default function Services() {
           {/* OWNERS: Seller Guide */}
           {activeTab === "owners" && activeTool === "guide" && (
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>Selling & Posting Guide</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>How to post your property successfully and close deals faster.</p>
+              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>
+                Selling & Posting Guide
+              </h2>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>
+                How to post your property successfully and close deals faster.
+              </p>
 
               <div style={{ display: "grid", gap: "12px" }}>
                 {[
-                  { title: "Take Premium Real Photos", desc: "Properties with clear, well-lit photos (living room, bedrooms, kitchen, view) get 5x more clicks. Avoid using dark or blurry images." },
-                  { title: "Describe Key Selling Points", desc: "Highlight RERA verification, nearby IT parks, beach access (if in Vizag), gated security, and water supply availability in your listing descriptions." },
-                  { title: "Price it Right", desc: "Check the 'Property Rates' tool to understand average prices in your locality before naming a price. Overpricing leads to fewer leads." }
+                  {
+                    title: "Take Premium Real Photos",
+                    desc: "Properties with clear, well-lit photos (living room, bedrooms, kitchen, view) get 5x more clicks. Avoid using dark or blurry images."
+                  },
+                  {
+                    title: "Describe Key Selling Points",
+                    desc: "Highlight RERA verification, nearby IT parks, beach access (if in Vizag), gated security, and water supply availability in your listing descriptions."
+                  },
+                  {
+                    title: "Price it Right",
+                    desc: "Check the 'Property Rates' tool to understand average prices in your locality before naming a price. Overpricing leads to fewer leads."
+                  }
                 ].map((item, idx) => (
-                  <div key={idx} style={{ padding: "14px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                    <div style={{ fontWeight: "800", color: "#0f172a", fontSize: "14px", marginBottom: "4px" }}>{item.title}</div>
-                    <div style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", fontWeight: "600" }}>{item.desc}</div>
+                  <div
+                    key={idx}
+                    style={{
+                      padding: "14px",
+                      background: "#f8fafc",
+                      borderRadius: "12px",
+                      border: "1px solid #e2e8f0"
+                    }}
+                  >
+                    <div style={{ fontWeight: "800", color: "#0f172a", fontSize: "14px", marginBottom: "4px" }}>
+                      {item.title}
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", fontWeight: "600" }}>
+                      {item.desc}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -535,9 +768,13 @@ export default function Services() {
           {/* OWNERS: Property Valuation Estimate */}
           {activeTab === "owners" && activeTool === "valuation" && (
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>Property Valuation Estimate</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>Calculate a quick valuation estimate for your property based on size and location.</p>
-              
+              <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 8px 0", color: "#0f172a" }}>
+                Property Valuation Estimate
+              </h2>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>
+                Calculate a quick valuation estimate for your property based on size and location.
+              </p>
+
               <ValuationCalculator />
             </div>
           )}
@@ -546,17 +783,43 @@ export default function Services() {
           {activeTab === "dealers" && activeTool === "analytics" && (
             <div>
               <h2 style={{ fontSize: "20px", fontWeight: "900", margin: "0 0 4px 0", color: "#0f172a" }}>Dealer Marketing & Leads</h2>
-              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>Real-time analytics mockup for active builders and registered dealers.</p>
+              <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px" }}>
+                Real-time analytics mockup for active builders and registered dealers.
+              </p>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "28px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                  gap: "16px",
+                  marginBottom: "28px"
+                }}
+              >
                 {[
                   { label: "Active Listings", val: "14", color: "#0054a6" },
                   { label: "Leads Generated", val: "124", color: "#16a34a" },
                   { label: "Impressions", val: "8.4k", color: "#8b5cf6" },
                   { label: "Avg response", val: "2 hrs", color: "#eab308" }
-                ].map(card => (
-                  <div key={card.label} style={{ padding: "16px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                    <div style={{ fontSize: "12px", color: "#64748b", fontWeight: "800", textTransform: "uppercase" }}>{card.label}</div>
+                ].map((card) => (
+                  <div
+                    key={card.label}
+                    style={{
+                      padding: "16px",
+                      background: "#f8fafc",
+                      borderRadius: "12px",
+                      border: "1px solid #e2e8f0"
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#64748b",
+                        fontWeight: "800",
+                        textTransform: "uppercase"
+                      }}
+                    >
+                      {card.label}
+                    </div>
                     <div style={{ fontSize: "24px", fontWeight: "900", color: card.color, marginTop: "4px" }}>{card.val}</div>
                   </div>
                 ))}
@@ -571,11 +834,27 @@ export default function Services() {
                     { week: "Week 2", count: 32, pct: "50%" },
                     { week: "Week 3", count: 48, pct: "75%" },
                     { week: "Week 4", count: 64, pct: "100%" }
-                  ].map(w => (
-                    <div key={w.week} style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "13px", fontWeight: "750" }}>
+                  ].map((w) => (
+                    <div
+                      key={w.week}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        fontSize: "13px",
+                        fontWeight: "750"
+                      }}
+                    >
                       <span style={{ width: "60px", color: "#475569" }}>{w.week}</span>
                       <div style={{ flex: 1, height: "16px", background: "#e2e8f0", borderRadius: "4px", overflow: "hidden" }}>
-                        <div style={{ width: w.pct, height: "100%", background: "#0054a6", transition: "width 0.3s" }}></div>
+                        <div
+                          style={{
+                            width: w.pct,
+                            height: "100%",
+                            background: "#0054a6",
+                            transition: "width 0.3s"
+                          }}
+                        ></div>
                       </div>
                       <span style={{ width: "80px", color: "#0f172a", textAlign: "right" }}>{w.count} Leads</span>
                     </div>
@@ -617,23 +896,16 @@ const inputStyle = {
   boxSizing: "border-box"
 };
 
-// Sub-component: Valuation calculator for owners
 function ValuationCalculator() {
+  const LOCALITY_MULTIPLIERS = {
+    Etcherla: 1500,
+    Arasavilli: 3200
+  };
+
   const [valCity, setValCity] = useState("Visakhapatnam");
   const [valLocality, setValLocality] = useState("Madhurawada");
   const [valArea, setValArea] = useState(1200);
   const [estimatedVal, setEstimatedVal] = useState(0);
-
-  const LOCALITY_MULTIPLIERS = {
-    Madhurawada: 5350,
-    Yendada: 5800,
-    Seethammadhara: 6200,
-    "MVP Colony": 6500,
-    Gajuwaka: 4600,
-    Balaga: 2800,
-    Etcherla: 1500,
-    Arasavilli: 3200
-  };
 
   useEffect(() => {
     const rate = LOCALITY_MULTIPLIERS[valLocality] || 3500;
@@ -660,11 +932,7 @@ function ValuationCalculator() {
 
         <div>
           <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>Select Locality</label>
-          <select
-            value={valLocality}
-            onChange={(e) => setValLocality(e.target.value)}
-            style={inputStyle}
-          >
+          <select value={valLocality} onChange={(e) => setValLocality(e.target.value)} style={inputStyle}>
             {valCity === "Visakhapatnam" ? (
               <>
                 <option value="Madhurawada">Madhurawada</option>
@@ -685,29 +953,24 @@ function ValuationCalculator() {
 
         <div>
           <label style={{ display: "block", fontSize: "12px", fontWeight: "800", marginBottom: "4px" }}>Super Builtup Area (sqft)</label>
-          <input
-            type="number"
-            value={valArea}
-            onChange={(e) => setValArea(Number(e.target.value))}
-            style={inputStyle}
-          />
+          <input type="number" value={valArea} onChange={(e) => setValArea(Number(e.target.value))} style={inputStyle} />
         </div>
       </div>
 
-      <div style={{
-        background: "#f8fafc",
-        border: "1px solid #e2e8f0",
-        borderRadius: "12px",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center"
-      }}>
+      <div
+        style={{
+          background: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          borderRadius: "12px",
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
         <div style={{ fontSize: "13px", fontWeight: "800", color: "#64748b", textTransform: "uppercase" }}>Estimated Market Value</div>
-        <div style={{ fontSize: "24px", fontWeight: "950", color: "#16a34a", marginTop: "6px" }}>
-          ₹{estimatedVal.toLocaleString("en-IN")}
-        </div>
+        <div style={{ fontSize: "24px", fontWeight: "950", color: "#16a34a", marginTop: "6px" }}>₹{estimatedVal.toLocaleString("en-IN")}</div>
         <div style={{ fontSize: "12px", color: "#94a3b8", fontWeight: "700", marginTop: "8px", textAlign: "center" }}>
           Note: This is an estimated market price calculated using current market averages of {valLocality}.
         </div>
@@ -715,3 +978,4 @@ function ValuationCalculator() {
     </div>
   );
 }
+
